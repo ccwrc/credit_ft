@@ -1,0 +1,15 @@
+{
+  "description": "ft trainer",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "FT\\": ""
+    }
+  },
+  "require": {
+    "php": ">=7.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7"
+  }
+}
