@@ -23,57 +23,83 @@ final class Credit
      */
     private $currency;
     /**
-     * @var \DateTimeImmutable
+     * @var \DateTime
      */
     private $dateOfLoan;
     /**
      * @var float
      */
     private $sumOfCustomerPayment;
-//    /**
-//     * @var \DateTimeImmutable
-//     */
-//    private $lastSettlement;
 
     public function __construct(
         float $loanAmount,
         float $commissionAmount,
         float $dailyInterest,
         string $currency,
-        \DateTimeImmutable $dateOfLoan
-    ) {
+        \DateTime $dateOfLoan
+    )
+    {
         $this->loanAmount = \abs($loanAmount);
         $this->commissionAmount = \abs($commissionAmount);
         $this->dailyInterest = \abs($dailyInterest);
         $this->currency = $currency;
         $this->dateOfLoan = $dateOfLoan;
         $this->sumOfCustomerPayment = 0.00;
-//        $this->lastSettlement = $dateOfLoan;
     }
 
     /**
-     * @param float $amount
+     * @param float $amount Only positive value
      * @param string $currency
-     * @param \DateTimeImmutable $dateOfPayment
      * @throws \Exception
      */
-    public function loanRepaymentByCustomer(
-        float $amount,
-        string $currency,
-        \DateTimeImmutable $dateOfPayment
-    ): void
+    public function loanRepaymentByCustomer(float $amount, string $currency): void
     {
+        // TODO    \DateTime $dateOfPayment
         if ($currency !== $this->currency) {
             throw new \Exception('some message');
         }
-        //TODO logic
+        $this->sumOfCustomerPayment += abs($amount);
     }
 
-    public function getBalance(): float
+    /**
+     * @param \DateTime $date
+     * @return float
+     * @throws \Exception
+     */
+    public function getBalanceToDate(\DateTime $date): float
     {
-        //TODO logic
-        return 11.11;
+        $sumoOfDailyInterest = self::getSumOfDailyInterest($this->dateOfLoan, $date);
+        $sumOfLoads = $sumoOfDailyInterest + $this->commissionAmount + $this->loanAmount;
+
+        return $sumOfLoads - $this->sumOfCustomerPayment;
     }
 
-    //TODO calculation of interest from the date range
+    /**
+     * @param \DateTime $startDate
+     * @param \DateTime $endDate
+     * @return float
+     * @throws \Exception
+     */
+    private function getSumOfDailyInterest(\DateTime $startDate, \DateTime $endDate): float
+    {
+        if (!self::isFirstDateEarlier($startDate, $endDate)) {
+            throw new \Exception('some message');
+        }
+        $diff = $startDate->diff($endDate);
+        $totalDays = (int)$diff->days;
+
+        return $totalDays * $this->dailyInterest;
+    }
+
+    /**
+     * @param \DateTime $firstDate
+     * @param \DateTime $secondDate
+     * @return bool
+     */
+    private static function isFirstDateEarlier(\DateTime $firstDate, \DateTime $secondDate): bool
+    {
+        $diff = \date_diff($firstDate, $secondDate, false);
+
+        return !(1 === $diff->invert);
+    }
 }

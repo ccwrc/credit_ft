@@ -12,7 +12,10 @@ class CreditTest extends TestCase
 {
     public function testCreation(): void
     {
-        //TODO
+        $date = new \DateTime('now');
+        $credit = new Credit(500, 50, 1, 'USD', $date);
+
+        $this->assertInstanceOf(Credit::class, $credit);
     }
 
 }
