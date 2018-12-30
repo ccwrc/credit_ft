@@ -30,6 +30,11 @@ final class Credit
      * @var float
      */
     private $sumOfCustomerPayment;
+    /**
+     * key -> serialized \DateTime object, value -> amount
+     * @var array
+     */
+    private $loanRepaymentLogger;
 
     public function __construct(
         float $loanAmount,
@@ -37,27 +42,33 @@ final class Credit
         float $dailyInterest,
         string $currency,
         \DateTime $dateOfLoan
-    )
-    {
+    ) {
         $this->loanAmount = \abs($loanAmount);
         $this->commissionAmount = \abs($commissionAmount);
         $this->dailyInterest = \abs($dailyInterest);
         $this->currency = $currency;
         $this->dateOfLoan = $dateOfLoan;
         $this->sumOfCustomerPayment = 0.00;
+        $this->loanRepaymentLogger = [];
     }
 
     /**
      * @param float $amount Only positive value
      * @param string $currency
+     * @param \DateTime $paymentDate
      * @throws \Exception
      */
-    public function loanRepaymentByCustomer(float $amount, string $currency): void
+    public function loanRepaymentByCustomer(
+        float $amount,
+        string $currency,
+        \DateTime $paymentDate
+    ): void
     {
-        // TODO    \DateTime $dateOfPayment
-        if ($currency !== $this->currency) {
+        if ($currency !== $this->currency || self::isFirstDateEarlier($paymentDate, $this->dateOfLoan)) {
             throw new \Exception('some message');
         }
+
+        $this->loanRepaymentLogger[serialize($paymentDate)] = abs($amount);
         $this->sumOfCustomerPayment += abs($amount);
     }
 
@@ -68,7 +79,27 @@ final class Credit
      */
     public function getBalanceToDate(\DateTime $date): float
     {
+        $sumOfCustomerPayment = 0;
+        foreach ($this->loanRepaymentLogger as $dateKey => $amount) {
+            if (self::isFirstDateEarlier(unserialize($dateKey), $date) || unserialize($dateKey) === $date) {
+                $sumOfCustomerPayment += $amount;
+            }
+        }
+
         $sumoOfDailyInterest = self::getSumOfDailyInterest($this->dateOfLoan, $date);
+        $sumOfLoads = $sumoOfDailyInterest + $this->commissionAmount + $this->loanAmount;
+
+        return $sumOfLoads - $sumOfCustomerPayment;
+    }
+
+    /**
+     * @return float
+     * @throws \Exception
+     */
+    public function getBalance(): float
+    {
+        $actualDate = new \DateTime('now');
+        $sumoOfDailyInterest = self::getSumOfDailyInterest($this->dateOfLoan, $actualDate);
         $sumOfLoads = $sumoOfDailyInterest + $this->commissionAmount + $this->loanAmount;
 
         return $sumOfLoads - $this->sumOfCustomerPayment;
