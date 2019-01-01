@@ -76,7 +76,7 @@ class FeatureContext implements Context
         float $amount
     ): void
     {
-        Assert::assertEquals($amount, $this->credit->getBalanceToDate(new DateTime("$date")));
+        Assert::assertEquals($amount, $this->credit->getBalanceToDate(new \DateTime("$date")));
     }
 
     /**
@@ -94,7 +94,7 @@ class FeatureContext implements Context
         float $amount2
     ): void
     {
-        Assert::assertEquals($amount1, $this->credit->getBalanceToDate(new DateTime("$date1")));
-        Assert::assertEquals($amount2, $this->credit->getBalanceToDate(new DateTime("$date2")));
+        Assert::assertEquals($amount1, $this->credit->getBalanceToDate(new \DateTime("$date1")));
+        Assert::assertEquals($amount2, $this->credit->getBalanceToDate(new \DateTime("$date2")));
     }
 }

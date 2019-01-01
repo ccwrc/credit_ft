@@ -10,14 +10,67 @@ use PHPUnit\Framework\TestCase;
 
 class CreditTest extends TestCase
 {
-    public function testCreation(): void
+    /**
+     * @return Credit
+     * @throws \Exception
+     */
+    public function testCreation(): Credit
     {
         $date = new \DateTime('now');
         $credit = new Credit(500, 50, 1, 'USD', $date);
 
         $this->assertInstanceOf(Credit::class, $credit);
+
+        return $credit;
     }
 
+    /**
+     * @depends testCreation
+     * @param Credit $credit
+     * @throws \Exception
+     */
+    public function testLoanRepaymentByCustomerExceptionDate(Credit $credit): void
+    {
+        $this->expectException(\Exception::class);
+        $credit->loanRepaymentByCustomer(12, 'USD', new \DateTime('now - 1 day'));
+    }
+
+    /**
+     * @depends testCreation
+     * @param Credit $credit
+     * @throws \Exception
+     */
+    public function testLoanRepaymentByCustomerExceptionMessage(Credit $credit): void
+    {
+        $this->expectExceptionMessage('some message');
+        $credit->loanRepaymentByCustomer(12, 'USD', new \DateTime('now - 1 day'));
+    }
+
+    /**
+     * @depends testCreation
+     * @param Credit $credit
+     * @throws \Exception
+     */
+    public function testLoanRepaymentByCustomerExceptionCurrency(Credit $credit): void
+    {
+        $this->expectException(\Exception::class);
+        $credit->loanRepaymentByCustomer(12, 'wrong currency', new \DateTime('now + 1 day'));
+    }
+
+    /**
+     * @depends testCreation
+     * @param Credit $credit
+     * @throws \Exception
+     */
+    public function testGetBalanceToDateException(Credit $credit): void
+    {
+        $this->expectException(\Exception::class);
+        $credit->getBalanceToDate(new \DateTime('now - 1 day'));
+    }
+
+    /**
+     * @throws \Exception
+     */
     public function testFutureBehat(): void
     {
         $dateOfLoan = new \DateTime('l, 2018-01-01 12:00:00 T');

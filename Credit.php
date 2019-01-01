@@ -93,19 +93,6 @@ final class Credit
     }
 
     /**
-     * @return float
-     * @throws \Exception
-     */
-    public function getBalance(): float
-    {
-        $actualDate = new \DateTime('now');
-        $sumoOfDailyInterest = self::getSumOfDailyInterest($this->dateOfLoan, $actualDate);
-        $sumOfLoads = $sumoOfDailyInterest + $this->commissionAmount + $this->loanAmount;
-
-        return $sumOfLoads - $this->sumOfCustomerPayment;
-    }
-
-    /**
      * @param \DateTime $startDate
      * @param \DateTime $endDate
      * @return float
