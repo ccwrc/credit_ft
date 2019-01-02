@@ -71,7 +71,7 @@ class FeatureContext implements Context
      * @param float $amount
      * @throws \Exception
      */
-    public function checkBalance(
+    public function checkBalanceAfterPaymentFromTheCustomer(
         string $date,
         float $amount
     ): void

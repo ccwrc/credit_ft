@@ -31,7 +31,7 @@ final class Credit
      */
     private $sumOfCustomerPayment;
     /**
-     * key -> serialized \DateTime object, value -> amount
+     * (key) serialized \DateTime object => (value) amount
      * @var array
      */
     private $loanRepaymentLogger;
@@ -64,7 +64,9 @@ final class Credit
         \DateTime $paymentDate
     ): void
     {
-        if ($currency !== $this->currency || self::isFirstDateEarlier($paymentDate, $this->dateOfLoan)) {
+        if ($currency !== $this->currency
+            || self::isFirstDateEarlier($paymentDate, $this->dateOfLoan)
+            || array_key_exists(serialize($paymentDate), $this->loanRepaymentLogger)) {
             throw new \Exception('some message');
         }
 

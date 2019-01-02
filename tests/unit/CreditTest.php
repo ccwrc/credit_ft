@@ -25,6 +25,22 @@ class CreditTest extends TestCase
     }
 
     /**
+     * @throws \Exception
+     */
+    public function testLoanRepaymentByCustomer(): void
+    {
+        $dateOfLoan = new \DateTime('l, 2016-02-27 12:00:00 T');
+        $paymentDay = new \DateTime('l, 2016-03-01 12:00:00 T');
+        $diffDates = $dateOfLoan->diff($paymentDay);
+        $diffFullDays = (int) $diffDates->days;
+        $dailyInterest = 2;
+        $credit = new Credit(1000, 500, $dailyInterest, 'zł', $dateOfLoan);
+        $credit->loanRepaymentByCustomer(500, 'zł', $paymentDay);
+
+        $this->assertEquals(1000 + ($dailyInterest * $diffFullDays), $credit->getBalanceToDate($paymentDay));
+    }
+
+    /**
      * @depends testCreation
      * @param Credit $credit
      * @throws \Exception
@@ -55,6 +71,35 @@ class CreditTest extends TestCase
     {
         $this->expectException(\Exception::class);
         $credit->loanRepaymentByCustomer(12, 'wrong currency', new \DateTime('now + 1 day'));
+    }
+
+    /**
+     * @depends testCreation
+     * @param Credit $credit
+     * @throws \Exception
+     */
+    public function testLoanRepaymentByCustomerExceptionSameDate(Credit $credit): void
+    {
+        $sameDateAndTime = new \DateTime('now + 1 day');
+        $credit->loanRepaymentByCustomer(12, 'USD', $sameDateAndTime);
+
+        $this->expectException(\Exception::class);
+        $credit->loanRepaymentByCustomer(12, 'USD', $sameDateAndTime);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testGetBalanceToDate(): void
+    {
+        $dateOfLoan = new \DateTime('l, 2016-05-27 12:00:00 T');
+        $secondDate = new \DateTime('l, 2019-03-01 12:07:00 T');
+        $diffDates = $dateOfLoan->diff($secondDate);
+        $diffFullDays = (int) $diffDates->days;
+        $dailyInterest = 2.123456789;
+        $credit = new Credit(1000, 500, $dailyInterest, 'who cares', $dateOfLoan);
+
+        $this->assertEquals(1500 + ($dailyInterest * $diffFullDays), $credit->getBalanceToDate($secondDate));
     }
 
     /**
