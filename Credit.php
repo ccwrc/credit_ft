@@ -88,8 +88,8 @@ final class Credit
             }
         }
 
-        $sumoOfDailyInterest = self::getSumOfDailyInterest($this->dateOfLoan, $date);
-        $sumOfLoads = $sumoOfDailyInterest + $this->commissionAmount + $this->loanAmount;
+        $sumOfDailyInterest = self::getSumOfDailyInterest($this->dateOfLoan, $date);
+        $sumOfLoads = $sumOfDailyInterest + $this->commissionAmount + $this->loanAmount;
 
         return $sumOfLoads - $sumOfCustomerPayment;
     }
